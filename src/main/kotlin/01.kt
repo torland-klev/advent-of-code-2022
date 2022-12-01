@@ -8,7 +8,7 @@ fun main() {
     val part1 = summed.max()
     println(part1)
 
-    // Sum of three highest bundlesp
+    // Sum of three highest bundles
     val part2 = summed.sortedDescending().take(3).sum()
     println(part2)
 }
