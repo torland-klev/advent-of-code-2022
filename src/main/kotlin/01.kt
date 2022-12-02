@@ -13,7 +13,7 @@ fun main() {
     println(part2)
 }
 
-val input = """
+private val input = """
     4601
     1583
     2995
