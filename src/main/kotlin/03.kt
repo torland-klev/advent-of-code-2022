@@ -1,24 +1,17 @@
 
 fun main() {
 
-    val part1 = input.split("\n").sumOf {
-        val halfLen = it.length / 2
-        val first = it.take(halfLen)
-        val second = it.takeLast(halfLen)
-        val similar = first.toCharArray().find { char -> second.contains(char) }!!.code
-        if (similar < 97) similar - 64 + 26 else similar - 96
-    }
+    println(input.split("\n").sumOf {
+        it.take(it.length / 2).toCharArray().find { char -> it.takeLast(it.length / 2).contains(char) }!!.code.let {
+            if (it < 97) it - 64 + 26 else it - 96
+        }
+    })
 
-    println(part1)
-
-
-    val part2 = input.split("\n").chunked(3).sumOf { list ->
-        val similar = list[0].find { list[1].contains(it) && list[2].contains(it) }!!.code
-        if (similar < 97) similar - 64 + 26 else similar - 96
-    }
-
-    println(part2)
-
+    println(input.split("\n").chunked(3).sumOf { list ->
+        list[0].find { list[1].contains(it) && list[2].contains(it) }!!.code.let {
+            if (it < 97) it - 64 + 26 else it - 96
+        }
+    })
 }
 
 private val input = """
