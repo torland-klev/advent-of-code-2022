@@ -1,6 +1,7 @@
 data class File(val name: String, val size: Int)
 
 data class Directory(val name: String, val parent: Directory?, val files: MutableSet<File> = mutableSetOf(), val subDirectories: MutableSet<Directory> = mutableSetOf()) {
+    // Runs into a recursive issue if not overridden
     override fun toString() = name
     override fun hashCode() = name.hashCode() + files.hashCode()
 }
@@ -62,141 +63,6 @@ fun List<String>.createDirectories(): Directory {
 
 fun List<Directory>.findDirectoryClosestTo(cutoff: Int) = this.map { it.name to it.size() }.filter { it.second >= cutoff }
     .minByOrNull { it.second }!!
-
-
-private val test = """$ cd /
-$ ls
-dir a
-14848514 b.txt
-8504156 c.dat
-dir d
-$ cd a
-$ ls
-dir e
-29116 f
-2557 g
-62596 h.lst
-$ cd e
-$ ls
-584 i
-$ cd ..
-$ cd ..
-$ cd d
-$ ls
-4060174 j
-8033020 d.log
-5626152 d.ext
-7214296 k    
-""".trimIndent()
-
-private val test2 = """$ cd wcbq
-$ ls
-dir bjnvmpc
-dir cnwczqp
-dir dpgwtwp
-dir gtsf
-dir nmsvc
-182848 qgh.qnh
-$ cd bjnvmpc
-$ ls
-224127 bbzdcqf
-267019 bjnvmpc.zhg
-263703 dspvfhr.mmh
-dir glwzwcvm
-dir hrjjrrvl
-dir nqbrm
-3983 ntsqzpp.lnl
-$ cd glwzwcvm
-$ ls
-167421 bjnvmpc.zsj
-dir llpmvt
-$ cd llpmvt
-$ ls
-167790 llpmvt.jhw
-$ cd ..
-$ cd ..
-$ cd hrjjrrvl
-$ ls
-91994 crlfnccb.svl
-2227 swffpq.nnc
-$ cd ..
-$ cd nqbrm
-$ ls
-165605 rpglpmr.zbh
-$ cd ..
-$ cd ..
-$ cd cnwczqp
-$ ls
-dir cfdn
-dir jdh
-$ cd cfdn
-$ ls
-dir bjnvmpc
-163111 gsmhfr
-dir phtt
-$ cd bjnvmpc
-$ ls
-257093 jstfcllw
-$ cd ..
-$ cd phtt
-$ ls
-219526 bgvm.mnq
-$ cd ..
-$ cd ..
-$ cd jdh
-$ ls
-dir wjzzvs
-$ cd wjzzvs
-$ ls
-135287 rpglpmr.zbh
-$ cd ..
-$ cd ..
-$ cd ..
-$ cd dpgwtwp
-$ ls
-dir vmwvpjn
-$ cd vmwvpjn
-$ ls
-dir bjnvmpc
-86191 hdcb.dhp
-140007 jstfcllw.tdd
-128243 npbmlv.zst
-$ cd bjnvmpc
-$ ls
-8694 grgj
-166456 pnrbvd.hdn
-$ cd ..
-$ cd ..
-$ cd ..
-$ cd gtsf
-$ ls
-231856 bjnvmpc
-225380 bmm.vwc
-dir llpmvt
-dir pqm
-279010 wnwgz.qjp
-$ cd llpmvt
-$ ls
-143990 nhbpmvb.pgn
-dir pnrbvd
-$ cd pnrbvd
-$ ls
-158450 ghjlw
-$ cd ..
-$ cd ..
-$ cd pqm
-$ ls
-147513 grgj
-$ cd ..
-$ cd ..
-$ cd nmsvc
-$ ls
-dir znlgg
-$ cd znlgg
-$ ls
-170386 djdv.gbf
-   
-""".trimIndent()
 
 private val input = """$ cd /
 $ ls
