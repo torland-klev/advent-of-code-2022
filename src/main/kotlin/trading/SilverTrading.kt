@@ -6,11 +6,14 @@ import kotlin.random.Random
 
 fun main() {
     level1()
+    level1_inplace_edge_case()
     level2()
     level3_sequential()
     level3_concurrent()
+    level3_inplace()
     level4_sequential()
     level4_concurrent()
+    level4_inplace()
 }
 
 fun level1() {
@@ -77,6 +80,23 @@ fun level3_concurrent() {
     println("- ${stop - start} ms")
 }
 
+fun level3_inplace() {
+    val api = Api(3000, 150, 3000)
+
+    val start = System.currentTimeMillis()
+    val calc = InPlaceCalculator(api)
+    val stop = System.currentTimeMillis()
+
+    val diff = api.getPrice(calc.getSellDay()) - api.getPrice(calc.getBuyDay())
+
+    if (diff == 149) {
+        print("Level 3 in place success ")
+    } else {
+        print("Level 3 in place failed ")
+    }
+    println("- ${stop - start} ms")
+}
+
 fun level4_sequential() {
     val api = Api(11_000, 10_001, 300_000)
 
@@ -113,6 +133,38 @@ fun level4_concurrent() {
     println("- ${stop - start} ms")
 }
 
+fun level4_inplace() {
+    val api = Api(40_000, 10_001, 300_000)
+
+    val start = System.currentTimeMillis()
+    val calc = InPlaceCalculator(api)
+    val stop = System.currentTimeMillis()
+
+    val diff = api.getPrice(calc.getSellDay()) - api.getPrice(calc.getBuyDay())
+
+    if (diff == 10_000) {
+        print("Level 4 in place success ")
+    } else {
+        print("Level 4 in place failed ")
+    }
+    println("- ${stop - start} ms")
+}
+
+fun level1_inplace_edge_case() {
+    val api = Api(10, 25, 1)
+    api.prices = listOf(100, 1, 2, 3, 1, 1, 4, 0, 1, 2)
+
+    val start = System.currentTimeMillis()
+    val calc = InPlaceCalculator(api)
+    val stop = System.currentTimeMillis()
+    if (calc.getBuyDay() == 1 && calc.getSellDay() == 6) {
+        print("Level 1 in place edge success ")
+    } else {
+        print("Level 1 in place edge failure ")
+    }
+    println("- ${stop - start} ms")
+}
+
 class Calculator(api: Api) {
 
     private val buyDay : Int
@@ -140,7 +192,6 @@ class Calculator(api: Api) {
     fun getBuyDay() = buyDay
     fun getSellDay() = sellDay
 }
-
 
 data class Diff(val diff: Int, val buyDay: Int, val sellDay: Int)
 
@@ -188,9 +239,45 @@ class ConcurrentCalculator(api: Api) {
     }
 }
 
+class InPlaceCalculator(api: Api) {
+
+    private val dayOfMinPrice: Int
+    private val dayOfMaxDiff: Int
+
+    init {
+        val days = api.getNumberOfDays()
+        val prices = (0 until days).map { api.getPrice(it) }
+
+        var maxDiff = prices[1] - prices[0]
+        var minElement = prices[0]
+        var minElementDay = 0
+        var buyDay = 0
+        var sellDay = 0
+
+        prices.forEachIndexed { day, price ->
+            if (price - minElement > maxDiff) {
+                maxDiff = price - minElement
+                sellDay = day
+                buyDay = minElementDay
+            }
+            if (price < minElement) {
+                minElement = price
+                minElementDay = day
+            }
+        }
+
+        dayOfMinPrice = buyDay
+        dayOfMaxDiff = sellDay
+    }
+
+
+    fun getBuyDay() = dayOfMinPrice
+    fun getSellDay() = dayOfMaxDiff
+}
+
 class Api(private val days: Int, private val maxPrice: Int, private val seed: Int) {
 
-    private val prices: List<Int> = (1..days).map { Random(seed + it).nextInt(maxPrice) }
+    var prices: List<Int> = (1..days).map { Random(seed + it).nextInt(maxPrice) }
 
     fun getNumberOfDays() = days
     fun getPrice(day: Int) = prices[day]
