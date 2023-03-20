@@ -126,7 +126,7 @@ class Calculator(api: Api) {
         val prices = (0 until days).map { api.getPrice(it) }
 
         val diffs = prices.dropLast(1).mapIndexed { index, price ->
-            (index until prices.size).map { undex ->
+            (index+1 until prices.size).map { undex ->
                 Diff(prices[undex] - price, index, undex)
             }
         }.flatten()
